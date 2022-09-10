@@ -1,0 +1,52 @@
+(ns {{baseNamespace}}.routes
+  (:require [io.pedestal.http :as http]
+            [io.pedestal.http.route :as route]))
+
+(defn not-implemented [body]
+  {:status 501 :body "Not Implemented"})
+
+;; stubbed handlers for this API
+(def handlers
+  {
+{{#apiInfo}}{{#apis}}
+  ;;
+  ;; {{classname}}
+  ;;
+{{#operations}}
+{{#operation}}
+
+    {{#summary}}
+    ;; {{{.}}}
+    {{/summary}}
+    ;; Parameters: {{^allParams}}This endpoint has no parameters{{/allParams}}
+    {{#allParams}}
+    ;;  {{#isBodyParam}}body: {{/isBodyParam}}{{#isPathParam}}path-param: {{/isPathParam}}{{#isQueryParam}}query-string: {{/isQueryParam}} {{paramName}} {{dataType}} - {{description}} {{^required}} [optional]{{/required}}{{#defaultValue}} [default to {{.}}]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}{{{.}}}{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}}
+    {{/allParams}}
+    ;; Returns: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}null (empty response body){{/returnType}}
+    {{nickname}} not-implemented
+{{/operation}}
+{{/operations}}
+{{/apis}}{{/apiInfo}}
+  })
+
+(defn make-routes [handler]
+  (route/expand-routes 
+  #{
+{{#apiInfo}}{{#apis}}
+{{#operations}}
+{{#operation}}
+  ["{{{path}}}" {{{httpMethod}}} ({{nickname}} handler) :route-name {{nickname}}]
+{{/operation}}
+{{/operations}}
+{{/apis}}{{/apiInfo}}
+  }))
+
+(defn create-server [handler & {:keys [port] :or {port 8089}}]
+  (http/create-server
+   {:io.pedestal.http/router :prefix-tree
+    ::http/routes (make-routes handler)
+    ::http/type   :jetty
+    ::http/port   port}))
+
+(defn start [handler]
+  (http/start (create-server handler)))

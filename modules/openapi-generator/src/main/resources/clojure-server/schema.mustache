@@ -1,0 +1,24 @@
+(ns {{modelPackage}})
+
+{{#models}}
+  {{#model}}
+  {{#hasVars}}
+(declare {{classname}})
+  {{/hasVars}}
+  {{/model}}
+{{/models}}
+
+{{#models}}
+  {{#model}}
+  {{#hasVars}}
+(def {{classname}}
+  [:map
+  {{#vars}}
+    ["{{name}}" {{^required}}{:optional true} {{/required}}{{dataType}}]
+  {{/vars}}
+  ]
+)
+
+  {{/hasVars}}
+  {{/model}}
+{{/models}}
